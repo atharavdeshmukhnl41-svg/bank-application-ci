@@ -1,0 +1,60 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  IMAGE_NAME: auth
+  REGISTRY: myacr.azurecr.io
+  TAG: $(Build.SourceVersion)  # commit SHA
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+
+- stage: Build
+  displayName: "Build Docker Image"
+  jobs:
+  - job: Build
+    displayName: "Build Docker Image"
+    steps:
+    - task: Checkout@2
+
+    # Install Docker (if not preinstalled)
+    - script: |
+        docker --version
+      displayName: "Check Docker version"
+
+    - script: |
+        docker build -f docker/Dockerfile.auth -t $(REGISTRY)/$(IMAGE_NAME):$(TAG) .
+      displayName: "Build Docker Image"
+
+    - script: |
+        echo $(DOCKER_PASSWORD) | docker login $(REGISTRY) -u $(DOCKER_USERNAME) --password-stdin
+      displayName: "Login to Container Registry"
+
+    - script: |
+        docker push $(REGISTRY)/$(IMAGE_NAME):$(TAG)
+      displayName: "Push Docker Image"
+
+- stage: Update-CD-Repo
+  displayName: "Update GitOps Repo"
+  dependsOn: Build
+  jobs:
+  - job: UpdateCD
+    steps:
+    - task: Checkout@2
+      inputs:
+        repository: bank-application-cd
+        persistCredentials: true
+
+    - script: |
+        cd environments/dev
+        sed -i "s/tag:.*/tag: $(TAG)/" auth-values.yaml
+        git config user.email "ci@myorg.com"
+        git config user.name "AzureDevOps CI"
+        git add auth-values.yaml
+        git commit -m "Update auth image to $(TAG)"
+        git push origin main
+      displayName: "Update GitOps CD Repo"
