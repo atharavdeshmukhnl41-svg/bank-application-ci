@@ -89,7 +89,7 @@ stages:
     - task: TerraformCLI@2
       displayName: Terraform Init
       inputs:
-        command: 'init'
+        command: 'plan'
         workingDirectory: '$(TF_WORKING_DIR)'
         backendType: 'azurerm'
         backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
