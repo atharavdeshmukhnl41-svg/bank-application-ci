@@ -26,7 +26,7 @@ module "acr" {
   source = "./modules/acr"
 
   acr_name            = var.acr_name
-  resource_group_name = module.resource_group.name
+  resource_group_name = var.resource_group.name
   location            = var.location
 }
 
