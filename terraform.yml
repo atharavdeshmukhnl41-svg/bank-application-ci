@@ -15,6 +15,8 @@ stages:
 - stage: Validate
   jobs:
   - job: validate
+    workspace:
+       clean: all   
     steps:
 
     - task: TerraformCLI@2
@@ -56,7 +58,16 @@ stages:
   dependsOn: Validate
   jobs:
   - job: plan
+    workspace:
+       clean: all 
     steps:
+
+    - script: |
+        rm -rf .terraform
+        rm -f .terraform.lock.hcl
+      workingDirectory: $(TF_WORKING_DIR)
+      displayName: Clean Terraform cache
+
     - task: TerraformCLI@2
       displayName: Terraform Init
       inputs:
@@ -76,19 +87,17 @@ stages:
 
 
     - task: TerraformCLI@2
-      displayName: Terraform Plan
+      displayName: Terraform Init
       inputs:
-        command: 'plan'
+        command: 'init'
         workingDirectory: '$(TF_WORKING_DIR)'
-        environmentServiceName: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
-        arguments: >
-          -input=false
-          -lock-timeout=5m
-          -var="environment=dev"
-          -var="subscription_id=$(subscription_id)"
-          -var="tenant_id=$(tenant_id)"
-          -var="client_id=$(client_id)"
-          -var="client_secret=$(client_secret)"
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'tfstatebankapp'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+        allowTelemetryCollection: true
         
 
 
