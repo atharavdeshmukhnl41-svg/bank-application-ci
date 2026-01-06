@@ -22,9 +22,16 @@ stages:
       inputs:
         command: 'init'
         workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
         backendType: 'azurerm'
         backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
         ensureBackend: true
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmResourceGroupLocation: 'centralindia'
+        backendAzureRmStorageAccountName: 'tfstatebankapp'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+        allowTelemetryCollection: true
         
 
     - task: TerraformCLI@2
@@ -32,6 +39,12 @@ stages:
       inputs:
         command: 'validate'
         workingDirectory: '$(TF_WORKING_DIR)'
+        vars: |
+          subscription_id=$(subscription_id)
+          tenant_id=$(tenant_id)
+          client_id=$(client_id)
+          client_secret=$(client_secret)
+        allowTelemetryCollection: true
 
 
 
@@ -49,9 +62,16 @@ stages:
       inputs:
         command: 'init'
         workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
         backendType: 'azurerm'
         backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
         ensureBackend: true
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmResourceGroupLocation: 'centralindia'
+        backendAzureRmStorageAccountName: 'tfstatebankapp'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+        allowTelemetryCollection: true
       
 
     - task: TerraformCLI@2
@@ -59,6 +79,8 @@ stages:
       inputs:
         command: 'plan'
         workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        allowTelemetryCollection: true
 
 # ===============================
 # STAGE 3: MANUAL APPROVAL
