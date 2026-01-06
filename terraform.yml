@@ -5,7 +5,7 @@ pool:
   name: azureagent
 
 variables:
-  TF_WORKING_DIR: $(System.DefaultWorkingDirectory)/bank-application-ci/terraform/environments/dev
+  TF_WORKING_DIR: $(System.DefaultWorkingDirectory)/terraform/environments/dev
 
 stages:
 
@@ -17,15 +17,6 @@ stages:
   - job: validate
     steps:
 
-    - script: |
-        echo "Checking Terraform"
-        terraform version
-        echo "Running Terraform Init"
-        cd $(TF_WORKING_DIR)
-        terraform init -var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)
-        echo "Running Terraform Validate"
-        terraform validate -var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret) -var ssh_public_key=$(publickey.secureFilePath)
-      displayName: "Terraform Init + Validate"
     - task: TerraformCLI@2
       displayName: Terraform Init
       inputs:
