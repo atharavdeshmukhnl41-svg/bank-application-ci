@@ -1,6 +1,23 @@
-variable "vnet_name" {}
-variable "resource_group_name" {}
-variable "location" {}
-variable "vnet_address_space" { type = list(string) }
-variable "aks_subnet_name" {}
-variable "aks_subnet_address_prefix" { type = list(string) }
+variable "vnet_name" {
+  type = string
+}
+
+variable "resource_group_name" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "vnet_address_space" {
+  type = list(string)
+}
+
+variable "aks_subnet_name" {
+  type = string
+}
+
+variable "aks_subnet_address_prefix" {
+  type = list(string)
+}
