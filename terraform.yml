@@ -16,14 +16,10 @@ stages:
   jobs:
   - job: validate
     steps:
-    - task: Bash@3
-      displayName: Export Terraform Path
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@1
+      displayName: Install Terraform
       inputs:
-        targetType: inline
-        script: |
-          echo "##vso[task.setvariable variable=TF_PATH]/usr/bin/terraform"
-          which terraform
-          terraform version
+        terraformVersion: '1.14.3'
 
     
     - task: TerraformCLI@2
