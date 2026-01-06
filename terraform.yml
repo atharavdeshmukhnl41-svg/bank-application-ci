@@ -1,108 +1,104 @@
-# azure-pipeline-terraform.yml
 trigger:
-  branches:
-    include:
-      - main
+- main
+
+pool:
+  name: azureagent
 
 variables:
-  ENVIRONMENT: 'dev'             # dev/prod, can override in pipeline
-  ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-  ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-  ARM_TENANT_ID: $(ARM_TENANT_ID)
-  ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-  TF_BACKEND_RG: '<backend-rg-name>'
-  TF_BACKEND_STORAGE: '<backend-storage-name>'
-  TF_BACKEND_CONTAINER: '<backend-container-name>'
-  TF_VERSION: '1.14.3'
+  TF_WORKING_DIR: $(System.DefaultWorkingDirectory)/bank-application-ci/terraform/environments/dev
 
 stages:
 
-# Stage 1: Terraform Init
-- stage: Terraform_Init
-  displayName: "Terraform Init"
+# ===============================
+# STAGE 1: INIT + VALIDATE
+# ===============================
+- stage: Validate
   jobs:
-  - job: Init
-    pool:
-      name: 'azureagent'
+  - job: validate
     steps:
     - task: TerraformCLI@2
-      displayName: "Terraform Init"
+      displayName: Terraform Init
       inputs:
-        provider: 'azurerm'
         command: 'init'
-        workingDirectory: 'terraform/environments/$(ENVIRONMENT)'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
         backendType: 'azurerm'
-        backendServiceArm: '$(AZURE_SUBSCRIPTION)'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
         ensureBackend: true
-        backendAzureRmResourceGroupName: $(TF_BACKEND_RG)
-        backendAzureRmStorageAccountName: $(TF_BACKEND_STORAGE)
-        backendAzureRmContainerName: $(TF_BACKEND_CONTAINER)
-        backendAzureRmKey: '$(ENVIRONMENT).tfstate'
-        environmentServiceNameAzureRM: '$(AZURE_SUBSCRIPTION)'
+        allowTelemetryCollection: true
+        
 
-# Stage 2: Terraform Validate
-- stage: Terraform_Validate
-  displayName: "Terraform Validate"
-  dependsOn: Terraform_Init
-  jobs:
-  - job: Validate
-    pool:
-      name: 'azureagent'
-    steps:
     - task: TerraformCLI@2
-      displayName: "Terraform Validate"
+      displayName: Terraform Validate
       inputs:
-        provider: 'azurerm'
         command: 'validate'
-        workingDirectory: 'terraform/environments/$(ENVIRONMENT)'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret) -var ssh_public_key=$(publickey.secureFilePath)'
+        allowTelemetryCollection: true
 
-# Stage 3: Terraform Plan
-- stage: Terraform_Plan
-  displayName: "Terraform Plan"
-  dependsOn: Terraform_Validate
+# ===============================
+# STAGE 2: PLAN
+# ===============================
+- stage: Plan
+  dependsOn: Validate
   jobs:
-  - job: Plan
-    pool:
-      name: 'azureagent'
+  - job: plan
     steps:
     - task: TerraformCLI@2
-      displayName: "Terraform Plan"
+      displayName: Terraform Init
       inputs:
-        provider: 'azurerm'
-        command: 'plan'
-        workingDirectory: 'terraform/environments/$(ENVIRONMENT)'
-        environmentServiceNameAzureRM: '$(AZURE_SUBSCRIPTION)'
-        commandOptions: '-var-file="$(ENVIRONMENT).tfvars" -out=tfplan'
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        ensureBackend: true
+        allowTelemetryCollection: true
 
-# Stage 5: Manual Approval for Production
-- stage: Terraform_Approval
-  displayName: "Manual Approval"
-  dependsOn: Terraform_Scan
-  condition: eq(variables['ENVIRONMENT'], 'prod')
+    - task: TerraformCLI@2
+      displayName: Terraform Plan
+      inputs:
+        command: 'plan'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        allowTelemetryCollection: true
+
+# ===============================
+# STAGE 3: MANUAL APPROVAL
+# ===============================
+- stage: Approval
+  dependsOn: Plan
   jobs:
-  - job: Approve
-    pool:
-      name: 'azureagent'
+  - job: approval
+    pool: server
     steps:
     - task: ManualValidation@0
       inputs:
-        notifyUsers: '<your-email@example.com>'
-        instructions: 'Please approve Terraform apply for production.'
+        instructions: Review Terraform plan and approve infrastructure changes.
 
-# Stage 6: Terraform Apply
-- stage: Terraform_Apply
-  displayName: "Terraform Apply"
-  dependsOn: [Terraform_Plan, Terraform_Approval]
+# ===============================
+# STAGE 4: APPLY
+# ===============================
+- stage: Apply
+  dependsOn: Approval
   jobs:
-  - job: Apply
-    pool:
-      name: 'azureagent'
+  - job: apply
     steps:
     - task: TerraformCLI@2
-      displayName: "Terraform Apply"
+      displayName: Terraform Init
       inputs:
-        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        ensureBackend: true
+        allowTelemetryCollection: true
+
+    - task: TerraformCLI@2
+      displayName: Terraform Apply
+      inputs:
         command: 'apply'
-        workingDirectory: 'terraform/environments/$(ENVIRONMENT)'
-        environmentServiceNameAzureRM: '$(AZURE_SUBSCRIPTION)'
-        commandOptions: '-auto-approve tfplan'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        allowTelemetryCollection: true
