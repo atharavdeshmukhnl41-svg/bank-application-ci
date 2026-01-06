@@ -1,0 +1,115 @@
+trigger:
+- main
+
+pool:
+  name: azureagent
+
+variables:
+  TF_WORKING_DIR: $(System.DefaultWorkingDirectory)/terraform/environments/dev
+
+stages:
+
+# ===============================
+# STAGE 1: INIT + VALIDATE
+# ===============================
+- stage: Validate
+  jobs:
+  - job: validate
+    steps:
+
+    - task: TerraformCLI@2
+      displayName: Terraform Init
+      inputs:
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        ensureBackend: true
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmResourceGroupLocation: 'centralindia'
+        backendAzureRmStorageAccountName: 'tfstatebankapp'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+        allowTelemetryCollection: true
+
+    - task: TerraformCLI@2
+      displayName: Terraform Validate
+      inputs:
+        command: 'validate'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        vars: |
+          subscription_id=$(subscription_id)
+          tenant_id=$(tenant_id)
+          client_id=$(client_id)
+          client_secret=$(client_secret)
+        allowTelemetryCollection: true
+
+
+
+# ===============================
+# STAGE 2: PLAN
+# ===============================
+- stage: Plan
+  dependsOn: Validate
+  jobs:
+  - job: plan
+    steps:
+    - task: TerraformCLI@2
+      displayName: Terraform Init
+      inputs:
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        ensureBackend: true
+        allowTelemetryCollection: true
+
+    - task: TerraformCLI@2
+      displayName: Terraform Plan
+      inputs:
+        command: 'plan'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        allowTelemetryCollection: true
+
+# ===============================
+# STAGE 3: MANUAL APPROVAL
+# ===============================
+- stage: Approval
+  dependsOn: Plan
+  jobs:
+  - job: approval
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      inputs:
+        instructions: Review Terraform plan and approve infrastructure changes.
+
+# ===============================
+# STAGE 4: APPLY
+# ===============================
+- stage: Apply
+  dependsOn: Approval
+  jobs:
+  - job: apply
+    steps:
+    - task: TerraformCLI@2
+      displayName: Terraform Init
+      inputs:
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        ensureBackend: true
+        allowTelemetryCollection: true
+
+    - task: TerraformCLI@2
+      displayName: Terraform Apply
+      inputs:
+        command: 'apply'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        allowTelemetryCollection: true
