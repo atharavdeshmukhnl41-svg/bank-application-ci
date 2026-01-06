@@ -2,7 +2,7 @@
 # Resource Group
 ############################################
 module "resource_group" {
-  source       = "../modules/resource-group"
+  source       = "../../modules/resource-group"
   project_name = var.project_name
   environment  = var.environment
   location     = var.location
@@ -12,7 +12,7 @@ module "resource_group" {
 # Network (VNet + Subnet for AKS)
 ############################################
 module "network" {
-  source                     = "./modules/network"
+  source                     = "../../modules/network"
   vnet_name                  = var.vnet_name
   resource_group_name         = var.resource_group.name
   location                   = var.location
@@ -24,7 +24,7 @@ module "network" {
 # Azure Container Registry (ACR)
 ############################################
 module "acr" {
-  source = "./modules/acr"
+  source = "../../modules/acr"
 
   acr_name            = var.acr_name
   resource_group_name = var.resource_group.name
@@ -35,7 +35,7 @@ module "acr" {
 # Azure Kubernetes Service (AKS)
 ############################################
 module "aks" {
-  source = "./modules/aks"
+  source = "../../modules/aks"
 
   aks_name              = var.aks_name
   location              = var.location
