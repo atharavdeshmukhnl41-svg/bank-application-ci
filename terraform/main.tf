@@ -34,13 +34,14 @@ module "acr" {
 # Azure Kubernetes Service (AKS)
 ############################################
 module "aks" {
-  source               = "./modules/aks"
-  aks_name             = var.aks_name
-  resource_group_name  = var.resource_group.name
-  location             = var.location
-  dns_prefix           = var.dns_prefix
-  node_count           = var.node_count
-  vm_size              = var.vm_size
-  kubernetes_version   = var.kubernetes_version
-  acr_id               = module.acr.acr_id
+  source = "./modules/aks"
+
+  aks_name              = var.aks_name
+  location              = var.location
+  resource_group_name   = module.resource_group.rg_name
+  dns_prefix            = var.dns_prefix
+  node_count            = var.node_count
+  vm_size               = var.vm_size
+  kubernetes_version    = var.kubernetes_version
+  subnet_id             = module.network.aks_subnet_id
 }
