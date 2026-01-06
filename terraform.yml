@@ -32,7 +32,7 @@ stages:
         backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
         ensureBackend: true
         allowTelemetryCollection: true
-        
+        terraformInstaller: '1.14.3'
 
     - task: TerraformCLI@2
       displayName: Terraform Validate
