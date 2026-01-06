@@ -57,6 +57,23 @@ stages:
   jobs:
   - job: plan
     steps:
+    - task: TerraformCLI@2
+      displayName: Terraform Init
+      inputs:
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        backendType: 'azurerm'
+        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        ensureBackend: true
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmResourceGroupLocation: 'centralindia'
+        backendAzureRmStorageAccountName: 'tfstatebankapp'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+        allowTelemetryCollection: true
+
+
 
     - task: TerraformCLI@2
       displayName: Terraform Plan
@@ -64,7 +81,8 @@ stages:
         command: 'plan'
         workingDirectory: '$(TF_WORKING_DIR)'
         environmentServiceName: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
-        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret) -var -lock-timeout=5m'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret) -var -lock-timeout=5m -input=false
+  -var="environment=dev"'
         
 
 
