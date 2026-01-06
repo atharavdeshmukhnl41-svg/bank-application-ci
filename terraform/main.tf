@@ -2,9 +2,10 @@
 # Resource Group
 ############################################
 module "resource_group" {
-  source               = "./modules/resource-group"
-  resource_group_name  = var.resource_group_name
-  location             = var.location
+  source       = "../modules/resource-group"
+  project_name = var.project_name
+  environment  = var.environment
+  location     = var.location
 }
 
 ############################################
@@ -45,3 +46,4 @@ module "aks" {
   kubernetes_version    = var.kubernetes_version
   subnet_id             = module.network.aks_subnet_id
 }
+
