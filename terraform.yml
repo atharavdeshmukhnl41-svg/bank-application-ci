@@ -38,8 +38,14 @@ stages:
       inputs:
         command: 'validate'
         workingDirectory: '$(TF_WORKING_DIR)'
-        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
+        vars: |
+          subscription_id=$(subscription_id)
+          tenant_id=$(tenant_id)
+          client_id=$(client_id)
+          client_secret=$(client_secret)
         allowTelemetryCollection: true
+
+
 
 # ===============================
 # STAGE 2: PLAN
