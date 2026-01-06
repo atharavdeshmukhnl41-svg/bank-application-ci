@@ -16,6 +16,16 @@ stages:
   jobs:
   - job: validate
     steps:
+    - task: Bash@3
+      displayName: Export Terraform Path
+      inputs:
+        targetType: inline
+        script: |
+          echo "##vso[task.setvariable variable=TF_PATH]/usr/bin/terraform"
+          which terraform
+          terraform version
+
+    
     - task: TerraformCLI@2
       displayName: Terraform Init
       inputs:
