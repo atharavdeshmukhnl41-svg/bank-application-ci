@@ -46,6 +46,13 @@ stages:
           client_secret=$(client_secret)
         allowTelemetryCollection: true
 
+    - script: |
+        az storage blob lease break \
+          --account-name tfstatebankapp \
+          --container-name tfstate \
+          --name dev.terraform.tfstate
+      displayName: "Ensure state lease is released"
+
 
 
 
@@ -72,6 +79,13 @@ stages:
         backendAzureRmContainerName: 'tfstate'
         backendAzureRmKey: 'dev.terraform.tfstate'
         allowTelemetryCollection: true
+        
+    - script: |
+        az storage blob lease break \
+          --account-name tfstatebankapp \
+          --container-name tfstate \
+          --name dev.terraform.tfstate
+      displayName: "Ensure state lease is released"
 
     - task: TerraformCLI@2
       displayName: Terraform Plan
