@@ -79,12 +79,12 @@ stages:
         backendAzureRmContainerName: 'tfstate'
         backendAzureRmKey: 'dev.terraform.tfstate'
         allowTelemetryCollection: true
-        
+
     - script: |
         az storage blob lease break \
           --account-name tfstatebankapp \
           --container-name tfstate \
-          --name dev.terraform.tfstate
+          --blob-name dev.terraform.tfstate
       displayName: "Ensure state lease is released"
 
     - task: TerraformCLI@2
