@@ -94,13 +94,16 @@ stages:
       inputs:
         command: 'plan'
         workingDirectory: '$(TF_WORKING_DIR)'
-        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret) -input=false'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret) -input=false -out=tfplan'
         allowTelemetryCollection: true
   
 
-
-      
-        
+    - task: InfracostSetup@2
+      inputs:
+        apiKey: $(INFRACOST_API_KEY)
+        version: '0.10.x'
+        currency: 'INR'
+       
 
 
 # ===============================
