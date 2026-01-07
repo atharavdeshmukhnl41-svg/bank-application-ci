@@ -15,10 +15,6 @@ variable "client_secret" {
   sensitive = true
 }
 
-variable "resource_group_name" {
-  type = string
-}
-
 variable "project_name" {
   type = string
 }
