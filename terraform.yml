@@ -88,15 +88,15 @@ stages:
 
     - task: TerraformCLI@2
       displayName: Terraform Plan
+      env:
+        subscription_id: $(subscription_id)
+        tenant_id: $(tenant_id)
+        client_id: $(client_id)
+        client_secret: $(client_secret)
       inputs:
         command: 'plan'
         workingDirectory: '$(TF_WORKING_DIR)'
         commandOptions: '-input=false'
-        vars: |
-          subscription_id=$(subscription_id)
-          tenant_id=$(tenant_id)
-          client_id=$(client_id)
-          client_secret=$(client_secret)
         allowTelemetryCollection: true
         
 
