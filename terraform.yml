@@ -89,6 +89,11 @@ stages:
       inputs:
         command: 'plan'
         workingDirectory: '$(TF_WORKING_DIR)'
+        vars: |
+          subscription_id=$(subscription_id)
+          tenant_id=$(tenant_id)
+          client_id=$(client_id)
+          client_secret=$(client_secret)
         commandOptions: '-input=false'
         allowTelemetryCollection: true
   
