@@ -7,7 +7,8 @@ module "resource_group" {
 
 module "network" {
   source                   = "../../modules/network"
-  vnet_name                = var.vnet_name
+  vnet_name                = "${var.project_name}-${var.environment}-vnet"
+
   resource_group_name      = module.resource_group.rg_name
   location                 = var.location
   vnet_address_space       = var.vnet_address_space
