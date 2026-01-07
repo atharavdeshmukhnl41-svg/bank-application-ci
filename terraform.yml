@@ -20,8 +20,6 @@ stages:
 - stage: Validate
   jobs:
   - job: validate
-    workspace:
-       clean: all   
     steps:
 
     - task: TerraformCLI@2
@@ -111,7 +109,7 @@ stages:
         apiKey: $(INFRACOST_API_KEY)
         version: '0.10.x'
         currency: 'INR'
-
+        
 # ===============================
 # STAGE 3: MANUAL APPROVAL
 # ===============================
