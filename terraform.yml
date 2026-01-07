@@ -98,19 +98,25 @@ stages:
         allowTelemetryCollection: true
   
 
+
+       
+
+- stage: Cost
+  dependsOn: Plan
+  jobs:
+  - job: cost
+    steps:
     - task: InfracostSetup@2
       inputs:
         apiKey: $(INFRACOST_API_KEY)
         version: '0.10.x'
         currency: 'INR'
-       
-
 
 # ===============================
 # STAGE 3: MANUAL APPROVAL
 # ===============================
 - stage: Approval
-  dependsOn: Plan
+  dependsOn: Cost
   jobs:
   - job: approval
     pool: server
