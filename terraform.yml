@@ -1,5 +1,10 @@
 trigger:
-- main
+  branches:
+    include:
+      - main  
+  paths:
+    include:
+      - $(System.DefaultWorkingDirectory)/bank_application_ci/terraform
 
 pool:
   name: azureagent
