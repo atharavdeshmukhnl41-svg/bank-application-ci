@@ -146,17 +146,15 @@ stages:
         backendAzureRmKey: 'dev.terraform.tfstate'
         allowTelemetryCollection: true
 
-    - task: TerraformCLI@2
-      displayName: Terraform Import - Resource Group
+    - task: TerraformCLI@0
+      displayName: Terraform Import RG
       inputs:
-        command: 'import'
-        workingDirectory: '$(TF_WORKING_DIR)'
-        backendType: 'azurerm'
-        backendServiceArm: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
-        ensureBackend: true
-        commandOptions: >
-          module.resource_group.azurerm_resource_group.rg
-          /subscriptions/$(subscription_id)/resourceGroups/bankapp-dev-rg
+        command: import
+        workingDirectory: $(TF_WORKING_DIR)
+        resourceAddress: module.resource_group.azurerm_resource_group.rg
+        resourceId: /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/bankapp-dev-rg
+        environmentServiceNameAzureRM: $(AZURE_SERVICE_CONNECTION)
+
 
     
     - task: TerraformCLI@2
