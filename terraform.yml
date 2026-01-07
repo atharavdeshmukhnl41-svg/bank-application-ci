@@ -146,6 +146,13 @@ stages:
         backendAzureRmKey: 'dev.terraform.tfstate'
         allowTelemetryCollection: true
 
+    - script: |
+        terraform import \
+        module.resource_group.azurerm_resource_group.rg \
+        /subscriptions/c02db223-ae2a-4677-943f-e5864c5361a3/resourceGroups/bankapp-dev-rg
+      workingDirectory: $(TF_WORKING_DIR)
+      displayName: Clean Terraform cache
+    
     - task: TerraformCLI@2
       displayName: Terraform Apply
       inputs:
