@@ -152,6 +152,7 @@ stages:
         command: 'import'
         workingDirectory: '$(TF_WORKING_DIR)'
         environmentServiceName: 'payasyougo(c02db223-ae2a-4677-943f-e5864c5361a3)'
+        commandOptions: '-var subscription_id=$(subscription_id) -var tenant_id=$(tenant_id) -var client_id=$(client_id) -var client_secret=$(client_secret)'
         allowTelemetryCollection: true
         resourceAddress: 'module.resource_group.azurerm_resource_group.rg'
         resourceId: '/subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/bankapp-dev-rg'
