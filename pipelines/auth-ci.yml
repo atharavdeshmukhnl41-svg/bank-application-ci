@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - services/auth/**
+
+pool:
+  name: azureagent
+
+variables:
+  IMAGE_NAME: auth
+  ACR_NAME: bankdevacr
+  ACR_LOGIN_SERVER: bankdevacr.azurecr.io
+  IMAGE_TAG: $(Build.BuildId)
+
+steps:
+- checkout: self
+
+- task: Docker@2
+  displayName: Build & Push Auth Image
+  inputs:
+    containerRegistry: payasyougo
+    repository: $(ACR_LOGIN_SERVER)/$(IMAGE_NAME)
+    command: buildAndPush
+    dockerfile: services/auth/Dockerfile
+    buildContext: services/auth
+    tags: |
+      $(IMAGE_TAG)
+      latest

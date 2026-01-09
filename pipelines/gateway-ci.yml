@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - services/gateway/**
+
+pool:
+  name: azureagent
+
+variables:
+  IMAGE_NAME: gateway
+  ACR_NAME: bankdevacr
+  ACR_LOGIN_SERVER: bankdevacr.azurecr.io
+  IMAGE_TAG: $(Build.BuildId)
+
+steps:
+- checkout: self
+
+- task: Docker@2
+  displayName: Build & Push Gateway Image
+  inputs:
+    containerRegistry: payasyougo
+    repository: $(ACR_LOGIN_SERVER)/$(IMAGE_NAME)
+    command: buildAndPush
+    dockerfile: services/gateway/Dockerfile
+    buildContext: services/gateway
+    tags: |
+      $(IMAGE_TAG)
+      latest
