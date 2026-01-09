@@ -18,14 +18,11 @@ variables:
 steps:
 - checkout: self
 
+
 - task: Docker@2
-  displayName: Build & Push Auth Image
   inputs:
-    containerRegistry: 'acr'
+    containerRegistry: 'azure-container-registry'
     repository: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME)'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
     buildContext: 'services/auth'
-    tags: |
-      $(IMAGE_TAG)
-      latest
