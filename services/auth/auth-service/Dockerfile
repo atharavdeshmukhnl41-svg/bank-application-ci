@@ -1,28 +1,27 @@
-# Use official Maven image to build the application
+# ---------- BUILD STAGE ----------
 FROM maven:3.9.3-eclipse-temurin-17 AS build
-
 WORKDIR /app
 
-# Copy pom.xml and download dependencies first (cache layer)
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+# Copy parent POM
+COPY pom.xml ./pom.xml
 
-# Copy source code
-COPY src ./src
+# Copy auth-service POM
+COPY auth-service/pom.xml auth-service/pom.xml
 
-# Package the application
-RUN mvn clean package -DskipTests
+# Download dependencies
+RUN mvn -f auth-service/pom.xml dependency:go-offline -B
 
-# Use lightweight JDK image for running
+# Copy source
+COPY auth-service/src auth-service/src
+
+# Build JAR
+RUN mvn -f auth-service/pom.xml clean package -DskipTests
+
+# ---------- RUNTIME STAGE ----------
 FROM eclipse-temurin:17-jre
-
 WORKDIR /app
 
-# Copy the jar from build stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/auth-service/target/*.jar app.jar
 
-# Expose application port (adjust if needed)
 EXPOSE 8080
-
-# Run the application
 ENTRYPOINT ["java","-jar","app.jar"]
