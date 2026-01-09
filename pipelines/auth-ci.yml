@@ -26,3 +26,4 @@ steps:
     command: 'buildAndPush'
     Dockerfile: 'services/auth/auth-service/Dockerfile'
     buildContext: 'services'
+    tags: '$(IMAGE_TAG)'
