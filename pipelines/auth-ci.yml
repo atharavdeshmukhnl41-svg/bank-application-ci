@@ -25,4 +25,4 @@ steps:
     repository: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME)'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
-    buildContext: 'services/auth'
+    buildContext: 'services/auth/auth-service'
