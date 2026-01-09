@@ -24,5 +24,5 @@ steps:
     containerRegistry: 'azure-container-registry'
     repository: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME)'
     command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-    buildContext: 'services/auth/auth-service'
+    Dockerfile: 'services/auth/auth-service/Dockerfile'
+    buildContext: 'services'
