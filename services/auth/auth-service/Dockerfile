@@ -3,21 +3,15 @@ FROM maven:3.9.3-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # Copy parent POM
-COPY pom.xml ./pom.xml
+COPY services/auth/pom.xml ./pom.xml
 
-# Copy auth-service POM
-COPY auth/auth-service/pom.xml auth/auth-service/pom.xml
+# Copy auth-service module
+COPY services/auth/auth-service ./auth-service
 
-# Download dependencies
-RUN mvn -f auth/auth-service/pom.xml dependency:go-offline -B
+# Build only auth-service module
+RUN mvn -pl auth-service -am clean package -DskipTests
 
-# Copy source
-COPY auth/auth-service/src auth/auth-service/src
-
-# Build JAR
-RUN mvn -f auth/auth-service/pom.xml clean package -DskipTests
-
-# ---------- RUNTIME STAGE ----------
+# ---------- RUNTIME ----------
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
