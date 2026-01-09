@@ -6,16 +6,16 @@ WORKDIR /app
 COPY pom.xml ./pom.xml
 
 # Copy auth-service POM
-COPY auth-service/pom.xml auth-service/pom.xml
+COPY auth/auth-service/pom.xml auth/auth-service/pom.xml
 
 # Download dependencies
-RUN mvn -f auth-service/pom.xml dependency:go-offline -B
+RUN mvn -f auth/auth-service/pom.xml dependency:go-offline -B
 
 # Copy source
-COPY auth-service/src auth-service/src
+COPY auth/auth-service/src auth/auth-service/src
 
 # Build JAR
-RUN mvn -f auth-service/pom.xml clean package -DskipTests
+RUN mvn -f auth/auth-service/pom.xml clean package -DskipTests
 
 # ---------- RUNTIME STAGE ----------
 FROM eclipse-temurin:17-jre
