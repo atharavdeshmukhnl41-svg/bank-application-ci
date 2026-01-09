@@ -21,11 +21,11 @@ steps:
 - task: Docker@2
   displayName: Build & Push Auth Image
   inputs:
-    containerRegistry: payasyougo
-    repository: $(ACR_LOGIN_SERVER)/$(IMAGE_NAME)
-    command: buildAndPush
-    dockerfile: services/auth/Dockerfile
-    buildContext: services/auth
+    containerRegistry: 'acr'
+    repository: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME)'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    buildContext: 'services/auth'
     tags: |
       $(IMAGE_TAG)
       latest
